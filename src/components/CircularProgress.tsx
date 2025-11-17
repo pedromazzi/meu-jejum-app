@@ -1,63 +1,77 @@
 import React from 'react';
 
 interface CircularProgressProps {
-  percentage: number;
-  size?: number;
-  strokeWidth?: number;
-  color?: string;
-  children?: React.ReactNode;
+  progress: number; // 0-100
+  duration: number; // duração total em ms
+  elapsedTime: number; // tempo decorrido em ms
+  endTime: string | null; // horário de término formatado
+  isFasting: boolean; // indica se o jejum está ativo
 }
 
 const CircularProgress: React.FC<CircularProgressProps> = ({
-  percentage,
-  size = 200,
-  strokeWidth = 8,
-  color = 'var(--primary)',
-  children,
+  progress,
+  duration,
+  elapsedTime,
+  endTime,
+  isFasting,
 }) => {
-  const radius = (size - strokeWidth) / 2;
+  const radius = 120;
   const circumference = 2 * Math.PI * radius;
-  const offset = circumference - (percentage / 100) * circumference;
+  const strokeDashoffset = circumference - (progress / 100) * circumference;
+
+  // Formata milissegundos para "XXh XXm"
+  const formatTime = (ms: number) => {
+    const totalSeconds = Math.floor(ms / 1000);
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    return `${hours.toString().padStart(2, '0')}h ${minutes.toString().padStart(2, '0')}m`;
+  };
+
+  const formattedElapsedTime = formatTime(elapsedTime);
+  const formattedDuration = formatTime(duration);
 
   return (
-    <div className="circular-progress-container" style={{ width: size, height: size }}>
-      <svg
-        width={size}
-        height={size}
-        className="circular-progress-svg"
-      >
-        {/* Background circle */}
+    <div className="circular-progress-wrapper">
+      <svg className="circular-progress-svg" width="280" height="280" viewBox="0 0 280 280">
+        <defs>
+          <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#00ff9d" />
+            <stop offset="100%" stopColor="#00d4aa" />
+          </linearGradient>
+        </defs>
+        {/* Círculo de fundo */}
         <circle
-          cx={size / 2}
-          cy={size / 2}
+          className="circular-progress-bg"
+          cx="140"
+          cy="140"
           r={radius}
-          fill="none"
-          stroke="rgba(255, 255, 255, 0.1)"
-          strokeWidth={strokeWidth}
+          strokeWidth="12"
         />
-        
-        {/* Progress circle */}
+        {/* Círculo de progresso */}
         <circle
-          cx={size / 2}
-          cy={size / 2}
+          className="circular-progress-bar"
+          cx="140"
+          cy="140"
           r={radius}
-          fill="none"
-          stroke={color}
-          strokeWidth={strokeWidth}
+          strokeWidth="12"
           strokeDasharray={circumference}
-          strokeDashoffset={offset}
+          strokeDashoffset={strokeDashoffset}
           strokeLinecap="round"
-          style={{
-            transition: 'stroke-dashoffset 0.5s ease',
-            transform: 'rotate(-90deg)',
-            transformOrigin: '50% 50%',
-          }}
+          transform="rotate(-90 140 140)"
+          style={{ transition: 'stroke-dashoffset 1s linear' }}
         />
       </svg>
-      
-      {/* Content inside circle */}
-      <div className="circular-progress-content">
-        {children}
+      <div className="circular-progress-text">
+        {isFasting ? (
+          <>
+            <p className="current-time">{formattedElapsedTime}</p>
+            <div className="divider"></div>
+            <p className="target-time">Meta: {formattedDuration}</p>
+            <p className="end-time">Termina: {endTime || '--:--'}</p>
+          </>
+        ) : (
+          <p className="not-fasting-text">Jejum Inativo</p>
+        )}
       </div>
     </div>
   );

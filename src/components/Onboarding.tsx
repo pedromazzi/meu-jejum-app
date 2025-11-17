@@ -381,7 +381,7 @@ const Onboarding: React.FC<OnboardingProps> = ({ onComplete }) => {
                     value={goal.value}
                     checked={selectedWaterGoalValue === goal.value}
                     onChange={() => {
-                      setSelectedWaterGoalValue(goal.value);
+                      setSelectedWaterGoalValue(goal.value as number | "custom");
                       if (goal.value !== 'custom') setCustomWaterGoalInput('');
                     }}
                   />

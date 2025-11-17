@@ -150,12 +150,10 @@ const Agua = () => {
         </button>
       </div>
 
-      <WaterCircularProgress percentage={progressPercentage}>
-        <div className="water-progress-text">
-          <div className="water-consumed">{formatLiters(consumedToday)}</div>
-          <div className="water-goal-small">de {formatLiters(waterGoal)}</div>
-        </div>
-      </WaterCircularProgress>
+      <WaterCircularProgress 
+        consumed={consumedToday}
+        goal={waterGoal}
+      />
 
       <div className="water-cups-grid">
         {Array.from({ length: cupsTotal }).map((_, index) => (
@@ -212,11 +210,6 @@ const Agua = () => {
         <NotificationsModal
           isOpen={showNotificationsModal}
           onClose={() => setShowNotificationsModal(false)}
-          settings={notificationSettings}
-          onSave={(settings) => {
-            // TODO: Implementar atualização via contexto
-            setShowNotificationsModal(false);
-          }}
         />
       )}
     </div>

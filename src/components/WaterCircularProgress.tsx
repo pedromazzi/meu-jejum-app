@@ -1,68 +1,53 @@
 import React from 'react';
 
 interface WaterCircularProgressProps {
-  percentage: number;
-  size?: number;
-  strokeWidth?: number;
-  children?: React.ReactNode;
+  consumed: number; // Consumido em ml
+  goal: number; // Meta em ml
 }
 
-const WaterCircularProgress: React.FC<WaterCircularProgressProps> = ({
-  percentage,
-  size = 180,
-  strokeWidth = 10,
-  children,
-}) => {
-  const radius = (size - strokeWidth) / 2;
+const WaterCircularProgress: React.FC<WaterCircularProgressProps> = ({ consumed, goal }) => {
+  const radius = 100;
   const circumference = 2 * Math.PI * radius;
-  const offset = circumference - (percentage / 100) * circumference;
+  const percentage = goal > 0 ? Math.min(100, (consumed / goal) * 100) : 0;
+  const strokeDashoffset = circumference - (percentage / 100) * circumference;
 
-  // Cor do progresso baseada na porcentagem
-  const getColor = (pct: number) => {
-    if (pct >= 75) return 'var(--primary)'; // Verde
-    if (pct >= 50) return 'var(--water-progress-medium)'; // Amarelo
-    return 'var(--water-progress-bad)'; // Vermelho
-  };
+  const formatLiters = (ml: number) => `${(ml / 1000).toFixed(1)}L`;
 
   return (
-    <div className="water-circular-progress" style={{ width: size, height: size }}>
-      <svg
-        width={size}
-        height={size}
-        className="water-circular-progress-svg"
-      >
-        {/* Background circle */}
+    <div className="water-circular-progress-wrapper">
+      <svg className="water-circular-progress-svg" width="240" height="240" viewBox="0 0 240 240">
+        <defs>
+          <linearGradient id="waterProgressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#00ff9d" />
+            <stop offset="100%" stopColor="#00d4ff" />
+          </linearGradient>
+        </defs>
+        {/* Círculo de fundo */}
         <circle
-          cx={size / 2}
-          cy={size / 2}
+          className="water-circular-progress-bg"
+          cx="120"
+          cy="120"
           r={radius}
-          fill="none"
-          stroke="rgba(255, 255, 255, 0.1)"
-          strokeWidth={strokeWidth}
+          strokeWidth="12"
         />
-        
-        {/* Progress circle */}
+        {/* Círculo de progresso */}
         <circle
-          cx={size / 2}
-          cy={size / 2}
+          className="water-circular-progress-bar"
+          cx="120"
+          cy="120"
           r={radius}
-          fill="none"
-          stroke={getColor(percentage)}
-          strokeWidth={strokeWidth}
+          strokeWidth="12"
           strokeDasharray={circumference}
-          strokeDashoffset={offset}
+          strokeDashoffset={strokeDashoffset}
           strokeLinecap="round"
-          style={{
-            transition: 'stroke-dashoffset 0.5s ease, stroke 0.3s ease',
-            transform: 'rotate(-90deg)',
-            transformOrigin: '50% 50%',
-          }}
+          transform="rotate(-90 120 120)"
+          style={{ transition: 'stroke-dashoffset 0.5s ease-out' }}
         />
       </svg>
-      
-      {/* Content inside circle */}
-      <div className="water-circular-progress-content">
-        {children}
+      <div className="water-circular-progress-text">
+        <p className="water-consumed">{formatLiters(consumed)}</p>
+        <p className="water-goal">Meta: {formatLiters(goal)}</p>
+        <p className="water-percentage">{Math.round(percentage)}%</p>
       </div>
     </div>
   );
