@@ -355,16 +355,13 @@ const Jejum = () => {
         </button>
       </div>
 
-      <div className="circular-progress-wrapper">
-        <CircularProgress percentage={progress}>
-          <div className="fast-timer-content">
-            <div className="fast-elapsed">{formatTime(elapsedTime)}</div>
-            <div className="fast-remaining">
-              {isFasting ? `Meta: ${formatTime(fastDurationMs)}` : 'Pronto para começar'}
-            </div>
-          </div>
-        </CircularProgress>
-      </div>
+      <CircularProgress 
+        progress={isFasting ? Math.min(100, (elapsedTime / fastDurationMs) * 100) : 0}
+        duration={fastDurationMs}
+        elapsedTime={elapsedTime}
+        endTime={isFasting ? new Date(fastStartTime + fastDurationMs).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : null}
+        isFasting={isFasting}
+      />
 
       <p className="community-counter">🔥 {communityCount.toLocaleString('pt-BR')} jejuando agora</p>
 
@@ -401,11 +398,6 @@ const Jejum = () => {
         <NotificationsModal
           isOpen={showNotificationsModal}
           onClose={() => setShowNotificationsModal(false)}
-          settings={notificationSettings}
-          onSave={(settings) => {
-            // TODO: Implementar atualização via contexto
-            setShowNotificationsModal(false);
-          }}
         />
       )}
     </div>
