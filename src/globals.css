@@ -1,0 +1,2128 @@
+/* Reset CSS Básico */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+  overflow: hidden; /* Previne scroll bounce */
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  background-color: var(--background);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Variáveis CSS */
+:root {
+  --primary: #00ff9d; /* verde neon */
+  --background: #0a0a0a; /* preto */
+  --card-bg: rgba(255, 255, 255, 0.05);
+  --text-primary: #ffffff;
+  --text-secondary: #999999;
+  --inactive-icon: #666666;
+  --destructive: #ff3b3b; /* vermelho para ações destrutivas/terminar */
+  --water-gradient-start: #00ff9d;
+  --water-gradient-end: #00d4ff; /* Azul para água */
+  --water-progress-good: #00ff9d; /* verde */
+  --water-progress-medium: #ffb800; /* amarelo */
+  --water-progress-bad: #ff3b3b; /* vermelho */
+}
+
+/* Estilos Gerais do App */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  max-width: 500px; /* Limita a largura para simular mobile */
+  margin: 0 auto;
+  background-color: var(--background);
+  position: relative; /* Para posicionar o BottomNav */
+}
+
+/* O app-header global foi removido. Cada página agora gerencia seu próprio cabeçalho. */
+
+.app-content {
+  flex-grow: 1;
+  height: calc(100vh - 70px); /* Altura total da viewport menos a altura da BottomNav */
+  padding-bottom: 30px; /* Espaço final antes da BottomNav */
+  overflow-y: auto; /* Permite rolagem no conteúdo principal */
+  -webkit-overflow-scrolling: touch; /* Melhora a rolagem em iOS */
+}
+
+.page-container {
+  /* Removido padding genérico. As páginas específicas devem gerenciar seu próprio padding. */
+}
+
+.page-title {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+}
+
+/* Bottom Navigation */
+.bottom-nav {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  max-width: 500px; /* Corresponde ao app-container */
+  margin: 0 auto;
+  height: 70px;
+  background-color: var(--background);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  z-index: 1000;
+}
+
+.bottom-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  color: var(--inactive-icon);
+  text-decoration: none;
+  font-size: 0.75rem;
+  transition: color 0.3s ease;
+  padding: 5px 0;
+}
+
+.bottom-nav-item.active {
+  color: var(--primary);
+}
+
+.bottom-nav-item svg {
+  margin-bottom: 4px;
+}
+
+.bottom-nav-label {
+  font-size: 0.75rem;
+}
+
+/* Remove scroll bounce no mobile */
+body {
+  overscroll-behavior-y: none;
+}
+
+/* Jejum Page Specific Styles */
+.jejum-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem; /* Espaço entre os elementos */
+  padding: 1rem; /* Padding lateral e superior */
+  padding-bottom: 100px; /* Espaço extra na parte inferior para o card de água e bottom nav */
+}
+
+.jejum-header { /* Renomeado de .jejum-page-header */
+  width: 100%;
+  display: flex;
+  justify-content: space-between; /* Ajustado para space-between */
+  align-items: center;
+  padding: 1rem;
+  background-color: var(--background);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 1rem; /* Espaço abaixo do cabeçalho */
+}
+
+.jejum-title { /* Renomeado de .app-title */
+  font-size: 1.8rem; /* 24px */
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0; /* Removido margem padrão */
+}
+
+/* Removido .jejum-page-header .header-icon pois será substituído */
+
+.protocol-card {
+  width: 90%;
+  background-color: var(--card-bg);
+  padding: 16px;
+  border-radius: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.protocol-card:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.protocol-label {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.protocol-name {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-top: 4px;
+}
+
+/* Removido .protocol-settings-icon pois será substituído */
+
+/* Circular Progress */
+.circular-progress-wrapper {
+  position: relative;
+  width: 280px;
+  height: 280px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 2rem 0;
+}
+
+.circular-progress-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.circular-progress-bg {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.1);
+  stroke-width: 12;
+}
+
+.circular-progress-bar {
+  fill: none;
+  stroke: url(#progressGradient);
+  stroke-width: 12;
+  transition: stroke-dashoffset 1s linear;
+}
+
+.circular-progress-text {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.circular-progress-text .current-time {
+  font-size: 3rem; /* 48px */
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.circular-progress-text .divider {
+  width: 60px;
+  height: 2px;
+  background-color: var(--inactive-icon);
+  margin: 10px 0;
+}
+
+.circular-progress-text .target-time,
+.circular-progress-text .end-time {
+  font-size: 1.25rem; /* 20px */
+  color: var(--text-secondary);
+  margin-top: 5px;
+}
+
+.circular-progress-text .end-time {
+  font-size: 1rem; /* 16px */
+}
+
+.circular-progress-text .not-fasting-text {
+  font-size: 1.5rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.community-counter {
+  font-size: 0.875rem; /* 14px */
+  color: var(--text-secondary);
+  text-align: center;
+  margin-bottom: 2rem;
+  transition: opacity 0.5s ease; /* Adicionado para a transição suave */
+}
+
+.main-action-button {
+  width: 90%;
+  height: 56px;
+  background-color: var(--primary);
+  color: var(--background);
+  border: 3px solid var(--primary); /* Adicionado borda */
+  border-radius: 16px;
+  font-size: 1.1rem; /* 16px */
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease; /* Transição para todas as propriedades */
+  box-shadow: 0 4px 12px rgba(0, 255, 157, 0.3); /* Adicionado sombra */
+  margin-bottom: 2rem;
+}
+
+.main-action-button:hover {
+  background-color: #00d889; /* Verde mais escuro no hover */
+  border-color: #00d889; /* Borda acompanha o fundo */
+  transform: translateY(-2px); /* Efeito de elevação */
+  box-shadow: 0 6px 16px rgba(0, 255, 157, 0.4); /* Sombra maior no hover */
+}
+
+.main-action-button:active {
+  transform: translateY(0); /* Retorna à posição original */
+  box-shadow: 0 2px 8px rgba(0, 255, 157, 0.3); /* Sombra menor no active */
+}
+
+.main-action-button.destructive {
+  background-color: var(--destructive);
+  border-color: var(--destructive); /* Borda acompanha o fundo */
+  color: var(--text-primary); /* Texto branco para botão vermelho */
+  box-shadow: 0 4px 12px rgba(255, 59, 59, 0.3);
+}
+
+.main-action-button.destructive:hover {
+  background-color: #e63333; /* Vermelho mais escuro no hover */
+  border-color: #e63333; /* Borda acompanha o fundo */
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(255, 59, 59, 0.4);
+}
+
+.water-card {
+  width: 90%;
+  background-color: var(--card-bg);
+  padding: 20px;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 2rem; /* Espaço antes da bottom nav */
+}
+
+.water-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.water-icon {
+  color: var(--primary);
+}
+
+.water-label {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.water-progress-text {
+  font-size: 1rem;
+  color: var(--text-secondary);
+}
+
+.water-progress-bar-container {
+  width: 100%;
+  height: 10px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.water-progress-bar {
+  height: 100%;
+  background-color: var(--primary);
+  border-radius: 5px;
+  transition: width 0.5s ease-out;
+}
+
+/* Protocol Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1001; /* Acima da bottom nav */
+}
+
+.protocol-modal-content {
+  background-color: var(--background);
+  padding: 2rem;
+  border-radius: 20px;
+  width: 90%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+}
+
+.modal-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary);
+  text-align: center;
+}
+
+.protocol-options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.protocol-option {
+  background-color: var(--card-bg);
+  padding: 14px 20px;
+  border-radius: 12px;
+  color: var(--text-primary);
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, border 0.3s ease;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 2px solid transparent;
+}
+
+.protocol-option:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.protocol-option.active {
+  border-color: var(--primary);
+  background-color: rgba(0, 255, 157, 0.1); /* Fundo verde claro para ativo */
+}
+
+.protocol-badge {
+  font-size: 0.9rem;
+  margin-left: 8px;
+}
+
+.modal-confirm-button {
+  width: 100%;
+  height: 50px;
+  background-color: var(--primary);
+  color: var(--background);
+  border: none;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+.modal-confirm-button:hover {
+  background-color: #00e68a;
+}
+
+.modal-confirm-button:active {
+  transform: scale(0.98);
+}
+
+/* --- Agua Page Specific Styles --- */
+.agua-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1rem;
+  padding-bottom: 100px; /* Espaço para a bottom nav */
+}
+
+.agua-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between; /* Ajustado para space-between */
+  align-items: center;
+  padding: 1rem;
+  background-color: var(--background);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 1rem;
+}
+
+.agua-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0; /* Removido margem padrão */
+}
+
+/* Removido .agua-header .header-icon e .agua-header .header-icon:first-of-type pois serão substituídos */
+
+.agua-goal-card {
+  width: 90%;
+  background-color: var(--card-bg);
+  padding: 16px;
+  border-radius: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.agua-goal-card:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.agua-goal-label {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.agua-goal-value {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-top: 4px;
+}
+
+/* Removido .agua-settings-icon pois será substituído */
+
+/* Water Circular Progress */
+.water-circular-progress-wrapper {
+  position: relative;
+  width: 240px;
+  height: 240px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 1.5rem 0;
+}
+
+.water-circular-progress-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.water-circular-progress-bg {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.1);
+  stroke-width: 12;
+}
+
+.water-circular-progress-bar {
+  fill: none;
+  stroke: url(#waterProgressGradient);
+  stroke-width: 12;
+  transition: stroke-dashoffset 0.5s ease-out;
+}
+
+.water-circular-progress-text {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.water-circular-progress-text .water-consumed {
+  font-size: 2.5rem; /* 40px */
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.water-circular-progress-text .water-goal {
+  font-size: 1.125rem; /* 18px */
+  color: var(--text-secondary);
+  margin-top: 5px;
+}
+
+.water-circular-progress-text .water-percentage {
+  font-size: 1rem; /* 16px */
+  color: var(--primary);
+  margin-top: 8px;
+}
+
+/* Water Cups Grid */
+.water-cups-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  width: 90%;
+  margin-bottom: 2rem;
+}
+
+.water-cup-item {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--inactive-icon);
+  transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease, opacity 0.3s ease;
+}
+
+.water-cup-item.filled {
+  background-color: rgba(0, 255, 157, 0.2);
+  color: var(--primary);
+  animation: cupFillAnimation 0.3s ease-out forwards;
+}
+
+@keyframes cupFillAnimation {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Water Add Button */
+.water-add-button {
+  background-color: var(--primary);
+  color: var(--background);
+  width: 90%;
+  height: 56px;
+  border: 3px solid var(--primary); /* Adicionado borda */
+  border-radius: 16px;
+  font-weight: 700;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.3s ease; /* Transição para todas as propriedades */
+  box-shadow: 0 4px 12px rgba(0, 255, 157, 0.3); /* Adicionado sombra */
+  margin-bottom: 2rem; /* Mantém a margem existente */
+}
+
+.water-add-button:hover {
+  background-color: #00d889;
+  border-color: #00d889;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 255, 157, 0.4);
+}
+
+.water-add-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(0, 255, 157, 0.3);
+}
+
+/* Water Week Summary - NEW STYLES */
+.weekly-history {
+  width: 90%; /* Ajustado para 90% como outros cards */
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 20px;
+  padding: 20px;
+  margin-bottom: 2rem; /* Espaçamento consistente */
+}
+
+.weekly-header {
+  font-size: 1.2rem; /* Ajustado para 1.2rem como outros títulos de seção */
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: var(--text-primary); /* Usando variável */
+}
+
+.weekly-days {
+  display: flex;
+  flex-direction: column;
+  gap: 10px; /* Espaçamento entre os dias */
+}
+
+.week-day-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.day-label {
+  width: 40px;
+  font-size: 0.9rem; /* Ajustado para 0.9rem */
+  font-weight: 600;
+  color: var(--text-secondary); /* Usando variável */
+}
+
+.progress-container {
+  flex: 1;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.percentage-text {
+  width: 45px;
+  text-align: right;
+  font-size: 0.9rem; /* Ajustado para 0.9rem */
+  font-weight: 600;
+  color: var(--text-primary); /* Usando variável */
+}
+
+.status-emoji {
+  font-size: 1rem; /* Ajustado para 1rem */
+}
+
+
+/* Water Config Modal Styles */
+.water-config-modal-content {
+  background-color: var(--background);
+  padding: 2rem;
+  border-radius: 20px;
+  width: 90%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+}
+
+.config-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.config-section-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.radio-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.radio-button {
+  background-color: var(--card-bg);
+  color: var(--text-primary);
+  padding: 10px 15px;
+  border-radius: 10px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.radio-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.radio-button.active {
+  border-color: var(--primary);
+  background-color: rgba(0, 255, 157, 0.1);
+}
+
+.custom-input-group {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 5px;
+}
+
+.custom-input {
+  flex-grow: 1;
+  background-color: var(--card-bg);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  padding: 10px 15px;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.custom-input:focus {
+  border-color: var(--primary);
+}
+
+.custom-input-unit {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+.modal-cancel-button {
+  background-color: var(--inactive-icon);
+  color: var(--text-primary);
+  padding: 12px 20px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+.modal-cancel-button:hover {
+  background-color: #555555;
+}
+
+/* --- Progresso Page Specific Styles --- */
+.progresso-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1rem;
+  padding-bottom: 100px; /* Espaço para a bottom nav */
+}
+
+.progresso-header {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  padding: 1rem;
+  background-color: var(--background);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 1rem;
+}
+
+.progresso-title {
+  font-size: 1.8rem; /* 24px */
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.streak-card {
+  width: 90%;
+  background-color: var(--card-bg);
+  padding: 24px;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+}
+
+.streak-label {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.current-streak-value {
+  font-size: 3.5rem; /* 56px */
+  font-weight: 700;
+  color: var(--primary);
+  line-height: 1;
+}
+
+.best-streak-info {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+.next-achievement {
+  font-size: 1rem;
+  color: var(--primary);
+  font-weight: 500;
+  margin-top: 8px;
+}
+
+.calendar-container {
+  width: 90%;
+  background: var(--card-bg);
+  border-radius: 20px;
+  padding: 20px;
+  margin-bottom: 1.5rem;
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.calendar-month-title {
+  font-size: 1.125rem; /* 18px */
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.calendar-nav-button {
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-size: 1.5rem; /* 24px */
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.3s ease;
+}
+
+.calendar-nav-button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.calendar-weekday {
+  text-align: center;
+  font-size: 0.75rem; /* 12px */
+  font-weight: 600;
+  color: var(--text-secondary);
+  padding: 4px;
+}
+
+.calendar-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+}
+
+.calendar-day {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 0.875rem; /* 14px */
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+}
+
+.calendar-day.status-completed {
+  background: var(--primary);
+  color: var(--background); /* Texto preto no verde neon */
+}
+
+.calendar-day.status-incomplete {
+  background: var(--destructive);
+  color: var(--text-primary);
+}
+
+.calendar-day.status-empty {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--inactive-icon);
+}
+
+.calendar-day.today {
+  outline: 2px solid var(--water-gradient-end); /* Azul para o dia atual */
+  outline-offset: 2px;
+}
+
+.calendar-day-empty {
+  aspect-ratio: 1;
+}
+
+.calendar-legend {
+  width: 90%;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background: var(--card-bg);
+  border-radius: 20px;
+  padding: 16px;
+  margin-bottom: 1.5rem;
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.legend-color {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.legend-color.status-completed {
+  background: var(--primary);
+}
+
+.legend-color.status-incomplete {
+  background: var(--destructive);
+}
+
+.legend-color.status-empty {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.stats-card {
+  width: 90%;
+  background-color: var(--card-bg);
+  padding: 20px;
+  border-radius: 20px;
+  margin-bottom: 2rem; /* Espaço para a bottom nav */
+}
+
+.stats-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.stat-item {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-value {
+  font-size: 2rem; /* 32px */
+  font-weight: 700;
+  color: var(--primary);
+  line-height: 1.2;
+}
+
+.stat-label {
+  font-size: 0.875rem; /* 14px */
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+/* --- Conquistas Page Specific Styles --- */
+.conquistas-page {
+  padding: 1rem;
+  padding-bottom: 100px; /* Espaço para a bottom nav */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.conquistas-page .progresso-header { /* Reutilizando o estilo do header de progresso */
+  margin-bottom: 1.5rem;
+}
+
+.conquistas-page .streak-card {
+  margin-bottom: 1.5rem;
+  width: 90%;
+}
+
+.streak-label {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.current-streak-value {
+  font-size: 3.5rem; /* 56px */
+  font-weight: 700;
+  color: var(--primary);
+  line-height: 1;
+}
+
+.next-achievement {
+  font-size: 1rem;
+  color: var(--primary);
+  font-weight: 500;
+  margin-top: 8px;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 12px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  font-size: 0.75rem; /* 12px */
+  color: var(--text-secondary);
+  margin-top: 8px;
+}
+
+.section-title {
+  font-size: 1.125rem; /* 18px */
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+  width: 90%; /* Alinhar com os cards */
+  text-align: left;
+}
+
+.badges-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); /* Ajuste para 2 colunas mobile, mais em desktop */
+  gap: 1rem; /* 16px */
+  margin-bottom: 1.5rem;
+  width: 90%;
+}
+
+@media (min-width: 768px) {
+  .badges-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.badge-card {
+  background: var(--card-bg);
+  border: 2px solid transparent;
+  border-radius: 1rem; /* 16px */
+  padding: 1.25rem; /* 20px */
+  text-align: center;
+  position: relative;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 160px; /* Altura mínima para consistência */
+}
+
+.badge-card.unlocked {
+  background: rgba(0, 255, 157, 0.1); /* Verde neon com transparência */
+  border-color: var(--primary);
+}
+
+.badge-card.special {
+  background: rgba(255, 184, 0, 0.1); /* Dourado com transparência */
+  border-color: #ffb800; /* Dourado */
+}
+
+.badge-checkmark {
+  position: absolute;
+  top: 0.5rem; /* 8px */
+  right: 0.5rem; /* 8px */
+  font-size: 1.25rem; /* 20px */
+  color: var(--primary);
+}
+
+.badge-card.special .badge-checkmark {
+  color: #ffb800; /* Dourado para badges especiais */
+}
+
+.badge-icon {
+  font-size: 3rem; /* 48px */
+  margin-bottom: 0.75rem; /* 12px */
+  transition: all 0.3s ease;
+  line-height: 1; /* Para centralizar melhor o emoji */
+}
+
+.badge-card.locked .badge-icon {
+  filter: grayscale(1);
+  opacity: 0.3;
+}
+
+.badge-name {
+  font-size: 1rem; /* 16px */
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem; /* 4px */
+}
+
+.badge-card.locked .badge-name {
+  color: var(--inactive-icon);
+}
+
+.badge-date {
+  font-size: 0.75rem; /* 12px */
+  color: var(--primary);
+  margin-top: 0.25rem; /* 4px */
+}
+
+.badge-card.special .badge-date {
+  color: #ffb800; /* Dourado para badges especiais */
+}
+
+.badge-requirement {
+  font-size: 0.75rem; /* 12px */
+  color: var(--text-secondary);
+  margin-top: 0.5rem; /* 8px */
+}
+
+.conquistas-page .stats-card {
+  width: 90%;
+  margin-bottom: 2rem; /* Espaço para a bottom nav */
+}
+
+.conquistas-page .stats-title {
+  margin-bottom: 1rem;
+}
+
+.conquistas-page .stats-grid {
+  gap: 1.25rem; /* 20px */
+}
+
+.conquistas-page .stat-value {
+  font-size: 2rem; /* 32px */
+}
+
+.conquistas-page .stat-label {
+  font-size: 0.875rem; /* 14px */
+}
+
+/* --- Aprender Page Specific Styles --- */
+.aprender-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1rem;
+  padding-bottom: 100px; /* Espaço para a bottom nav */
+}
+
+.aprender-header {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  padding: 1rem;
+  background-color: var(--background);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 1rem;
+}
+
+.aprender-title {
+  font-size: 1.8rem; /* 24px */
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 0 16px;
+  height: 48px;
+  margin-bottom: 20px;
+  width: 90%; /* Alinhar com outros cards */
+}
+
+.search-icon {
+  font-size: 18px;
+  margin-right: 12px;
+  color: var(--text-secondary);
+}
+
+.search-input {
+  flex: 1;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  font-size: 1rem; /* 16px */
+  outline: none;
+}
+
+.search-input::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.7;
+}
+
+.categories-tabs {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  margin-bottom: 24px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  width: 90%; /* Alinhar com outros cards */
+  -webkit-overflow-scrolling: touch; /* Melhorar scroll em iOS */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;  /* IE and Edge */
+}
+
+.categories-tabs::-webkit-scrollbar { /* Chrome, Safari, Opera */
+  display: none;
+}
+
+.category-tab {
+  white-space: nowrap;
+  font-size: 0.875rem; /* 14px */
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding-bottom: 8px;
+  border: none; /* Remover borda padrão do botão */
+  background: none; /* Remover fundo padrão do botão */
+  border-bottom: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.category-tab.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+
+.articles-list {
+  width: 90%; /* Alinhar com outros cards */
+}
+
+.article-card {
+  background: var(--card-bg);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.article-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.article-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.article-icon {
+  font-size: 2rem; /* 32px */
+  line-height: 1; /* Para alinhar melhor o emoji */
+}
+
+.article-info {
+  flex: 1;
+}
+
+.article-title {
+  font-size: 1rem; /* 16px */
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.article-description {
+  font-size: 0.875rem; /* 14px */
+  color: var(--text-secondary);
+}
+
+.article-arrow {
+  color: var(--primary);
+  font-size: 1.25rem; /* 20px */
+  align-self: center;
+}
+
+.article-content {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  color: #cccccc;
+  font-size: 0.875rem; /* 14px */
+  line-height: 1.6;
+  white-space: pre-line; /* Preserva quebras de linha do conteúdo */
+}
+
+.no-results-text {
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 1rem;
+  margin-top: 2rem;
+}
+
+/* --- Notification & Settings Icon Button Styles --- */
+.icon-button-visuals {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  color: var(--inactive-icon); /* Default icon color */
+  cursor: pointer;
+  padding: 10px; /* Padding inside the circle */
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  flex-shrink: 0; /* Prevent shrinking in flex containers */
+}
+
+.icon-button-visuals:hover {
+  background: rgba(0, 255, 157, 0.1);
+  border-color: var(--primary);
+  color: var(--primary);
+  transform: scale(1.05);
+}
+
+.icon-button-visuals:active {
+  transform: scale(0.95);
+}
+
+/* Header Icons Container */
+.header-icons {
+  display: flex;
+  gap: 12px; /* Espaçamento entre os ícones */
+  align-items: center;
+}
+
+/* Styles for the modal close button (retained from previous step) */
+.notifications-modal .close-button {
+  background: none;
+  border: none;
+  color: var(--inactive-icon);
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.notifications-modal .close-button:hover {
+  color: var(--text-primary);
+}
+
+/* --- Notifications Modal Styles (Refatorado) --- */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.notifications-modal {
+  background: #1a1a1a;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 500px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.notifications-modal .modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.notifications-modal .modal-header h2 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+.notifications-modal .modal-close { /* Renomeado de .close-button */
+  background: none;
+  border: none;
+  color: #999999;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+  transition: color 0.3s ease;
+}
+
+.notifications-modal .modal-close:hover {
+  color: #ffffff;
+}
+
+.notifications-modal .modal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+}
+
+.notifications-modal .modal-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.notifications-modal .modal-body::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 3px;
+}
+
+.notifications-modal .modal-body::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+.notification-section {
+  margin-bottom: 32px;
+  background-color: var(--card-bg); /* Fundo para a seção */
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+.notification-section:last-child {
+  margin-bottom: 0;
+}
+
+.section-title {
+  font-size: 1.1rem; /* Ajustado para 1.1rem */
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+}
+
+.notification-options {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.notification-toggle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  transition: background 0.3s ease;
+}
+
+.notification-toggle:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.notification-toggle input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: #00ff9d;
+}
+
+.toggle-label {
+  color: #ffffff;
+  font-size: 0.95rem; /* Ajustado para melhor legibilidade */
+  flex: 1;
+}
+
+.time-input-group,
+.time-range-group {
+  margin-left: 32px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+}
+
+.input-label {
+  color: #999999;
+  font-size: 0.9rem; /* Ajustado para 0.9rem */
+  margin-right: 12px;
+}
+
+.time-input,
+.select-input {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: var(--text-primary);
+  font-size: 0.9rem; /* Ajustado para 0.9rem */
+  outline: none;
+  transition: border-color 0.3s ease;
+  -webkit-appearance: none; /* Remover estilo padrão do navegador */
+  -moz-appearance: none;
+  appearance: none;
+}
+
+.time-input:focus,
+.select-input:focus {
+  border-color: var(--primary);
+}
+
+.time-range-inputs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  flex-wrap: wrap; /* Para responsividade */
+}
+
+.time-range-inputs span {
+  color: #999999;
+  font-size: 0.9rem; /* Ajustado para 0.9rem */
+}
+
+.select-input {
+  padding-right: 30px; /* Espaço para a seta do select */
+  background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23999999%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095.1a17.6%2017.6%200%200%200%205.4-12.9c0-5-1.8-9.3-5.4-12.9z%22%2F%3E%3C%2Fsvg%3E');
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 12px;
+}
+
+.notifications-modal .modal-footer {
+  padding: 20px 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  justify-content: center;
+}
+
+.notifications-modal .btn-save { /* Renomeado de .btn-primary */
+  width: 100%;
+  background: #00ff9d;
+  color: #0a0a0a;
+  border: 3px solid #00ff9d;
+  border-radius: 12px;
+  padding: 16px;
+  font-size: 1.1rem; /* Ajustado para 1.1rem */
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 255, 157, 0.3);
+}
+
+.notifications-modal .btn-save:hover {
+  background: #00d889;
+  border-color: #00d889;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 255, 157, 0.4);
+}
+
+/* Onboarding Overlay */
+.onboarding-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #0a0a0a;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  overflow-y: auto; /* Habilitar rolagem vertical */
+  -webkit-overflow-scrolling: touch; /* Rolagem suave em iOS */
+}
+
+.onboarding-container {
+  width: 100%;
+  max-width: 500px;
+  text-align: center;
+  min-height: 100vh; /* Permitir que o conteúdo se estenda */
+  display: flex; /* Manter flex para layout interno */
+  flex-direction: column; /* Manter flex para layout interno */
+  justify-content: flex-start; /* Alinhar conteúdo ao topo */
+  padding: 0 20px 160px 20px; /* Ajustado padding-top para 0 */
+}
+
+.onboarding-slide {
+  animation: fadeIn 0.4s ease;
+  margin-bottom: 40px; /* Mantido para espaçamento entre slides */
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Ícones SVG do Onboarding */
+.onboarding-icon {
+  color: #00ff9d;
+  filter: drop-shadow(0 4px 16px rgba(0, 255, 157, 0.4));
+  animation: floatIcon 3s ease-in-out infinite;
+  margin-bottom: 24px;
+  display: flex; /* Para centralizar o SVG */
+  justify-content: center; /* Para centralizar o SVG */
+  align-items: center; /* Para centralizar o SVG */
+}
+
+@keyframes floatIcon {
+  0%, 100% { 
+    transform: translateY(0px);
+  }
+  50% { 
+    transform: translateY(-12px);
+  }
+}
+
+.onboarding-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 16px;
+  line-height: 1.2;
+}
+
+.onboarding-description {
+  font-size: 16px;
+  color: #999999;
+  margin-bottom: 32px;
+}
+
+.onboarding-features {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 40px;
+}
+
+.feature-item {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 20px 16px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-size: 14px;
+  color: #cccccc;
+  transition: all 0.3s ease;
+}
+
+.feature-item:hover {
+  background: rgba(0, 255, 157, 0.1);
+  transform: translateY(-2px);
+}
+
+.feature-icon {
+  color: #00ff9d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.protocol-options,
+.water-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.protocol-option,
+.water-option {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid transparent;
+  border-radius: 12px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+}
+
+.protocol-option.selected,
+.water-option.selected {
+  background: rgba(0, 255, 157, 0.1);
+  border-color: #00ff9d;
+}
+
+.protocol-option:hover,
+.water-option:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.protocol-option input,
+.water-option input {
+  width: 20px;
+  height: 20px;
+  accent-color: #00ff9d;
+  cursor: pointer;
+}
+
+.protocol-info {
+  flex: 1;
+}
+
+.protocol-label {
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 4px;
+}
+
+.protocol-description {
+  font-size: 14px;
+  color: #999999;
+}
+
+.custom-water-input {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+  padding: 0 16px;
+}
+
+.custom-water-input input {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 12px;
+  color: #ffffff;
+  font-size: 16px;
+}
+
+.custom-water-input span {
+  color: #999999;
+}
+
+.onboarding-hint {
+  font-size: 14px;
+  color: #00ff9d;
+  margin-top: 16px;
+}
+
+.slide-indicators {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 0; /* Ajustado padding */
+  margin-bottom: 20px; /* Ajustado margin */
+}
+
+.slide-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+.slide-dot.active {
+  background: #00ff9d;
+  width: 24px;
+  border-radius: 4px;
+}
+
+/* Novo estilo para os botões no topo */
+.onboarding-buttons-top {
+  display: flex;
+  gap: 12px;
+  justify-content: center; /* Centralizar os botões */
+  padding: 20px;
+  width: 100%;
+  max-width: 500px; /* Corresponde ao onboarding-container */
+  margin: 0 auto; /* Centralizar */
+  position: sticky;
+  top: 0;
+  background: #0a0a0a;
+  z-index: 10;
+  border-bottom: 1px solid rgba(0, 255, 157, 0.1);
+}
+
+/* Removido o estilo antigo .onboarding-buttons */
+
+.btn-onboarding-secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  padding: 14px 28px;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex; /* Adicionado para alinhar ícone e texto */
+  align-items: center; /* Adicionado para alinhar ícone e texto */
+  gap: 8px; /* Espaçamento entre ícone e texto */
+}
+
+.btn-onboarding-secondary:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.btn-onboarding-secondary svg {
+  color: #ffffff;
+}
+
+.btn-onboarding-primary {
+  background: #00ff9d;
+  color: #0a0a0a;
+  border: 3px solid #00ff9d;
+  padding: 14px 28px;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 255, 157, 0.3);
+  display: flex; /* Adicionado para alinhar ícone e texto */
+  align-items: center; /* Adicionado para alinhar ícone e texto */
+  gap: 8px; /* Espaçamento entre ícone e texto */
+}
+
+.btn-onboarding-primary:hover {
+  background: #00d889;
+  border-color: #00d889;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 255, 157, 0.4);
+}
+
+.btn-onboarding-primary svg {
+  color: #0a0a0a;
+}
+
+/* Disclaimer */
+.disclaimer-icon {
+  color: #ffb800;  /* Amarelo/laranja para alerta */
+}
+
+.disclaimer-content {
+  text-align: left;
+  width: 100%;
+}
+
+.disclaimer-box {
+  background: rgba(255, 184, 0, 0.1);
+  border: 2px solid rgba(255, 184, 0, 0.3);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.disclaimer-text {
+  color: #ffffff;
+  font-size: 15px;
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+.disclaimer-text strong {
+  color: #ffb800;
+}
+
+.disclaimer-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.disclaimer-item {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  color: #cccccc;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.disclaimer-bullet {
+  color: #ffb800;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.disclaimer-warning {
+  background: rgba(255, 59, 59, 0.1);
+  border-left: 3px solid #ff3b3b;
+  padding: 12px;
+  border-radius: 6px;
+  color: #ffffff;
+  font-size: 14px;
+}
+
+.disclaimer-checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.disclaimer-checkbox:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.disclaimer-checkbox input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+  cursor: pointer;
+  accent-color: #00ff9d;
+}
+
+.disclaimer-checkbox span {
+  color: #ffffff;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Botão desabilitado */
+.btn-onboarding-primary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none; /* Remover sombra para desabilitado */
+}
+
+.btn-onboarding-primary:disabled:hover {
+  background: #00ff9d; /* Manter cor original do botão primário */
+  border-color: #00ff9d;
+  transform: none;
+  box-shadow: 0 4px 12px rgba(0, 255, 157, 0.3); /* Manter sombra original */
+}
+
+/* PWA Install Banner */
+.install-banner {
+  position: fixed;
+  bottom: 80px; /* Acima da bottom nav */
+  left: 16px;
+  right: 16px;
+  background: linear-gradient(135deg, rgba(0, 255, 157, 0.15) 0%, rgba(0, 255, 157, 0.05) 100%);
+  border: 2px solid #00ff9d;
+  border-radius: 16px;
+  padding: 16px;
+  z-index: 1000;
+  animation: slideUpBanner 0.4s ease;
+  box-shadow: 0 8px 24px rgba(0, 255, 157, 0.2);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px); /* Para compatibilidade Safari */
+}
+
+@keyframes slideUpBanner {
+  from {
+    transform: translateY(120px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.install-banner-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: none;
+  border: none;
+  color: #999999;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+  transition: color 0.2s ease;
+  display: flex; /* Para centralizar o ícone X */
+  align-items: center;
+  justify-content: center;
+}
+
+.install-banner-close:hover {
+  color: #ffffff;
+}
+
+.install-banner-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.install-banner-icon {
+  color: #00ff9d; /* Cor do ícone */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.install-banner-text h3 {
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0 0 4px 0;
+}
+
+.install-banner-text p {
+  color: #cccccc;
+  font-size: 13px;
+  margin: 0;
+}
+
+.install-banner-button {
+  width: 100%;
+  background: #00ff9d;
+  color: #0a0a0a;
+  border: none;
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.install-banner-button:hover {
+  background: #00d889;
+  transform: translateY(-2px);
+}
+
+.install-banner-button:active {
+  transform: translateY(0);
+}
+
+/* Estilo para o botão de instalação permanente no header */
+.install-header-button {
+  background: rgba(0, 255, 157, 0.1); /* Fundo verde neon transparente */
+  border: 2px solid var(--primary);
+  border-radius: 50%;
+  color: var(--primary);
+  cursor: pointer;
+  padding: 10px;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.install-header-button:hover {
+  background: rgba(0, 255, 157, 0.2);
+  transform: scale(1.05);
+}
+
+.install-header-button:active {
+  transform: scale(0.95);
+}
