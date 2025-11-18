@@ -7,6 +7,7 @@ import { useApp } from '../context/AppContext';
 import { useNavigate } from 'react-router-dom';
 import { showSuccess } from '../utils/toast'; // Importar para notificações
 import { isAppInstalled, isSafariBrowser } from '../utils/pwa'; // Importar utilitários PWA
+import { scheduleFastingProgress, cancelFastingProgress } from '../utils/notifications'; // Importar funções de notificação SW
 
 // Define tipos para melhor segurança de tipo
 interface FastingProtocol {
@@ -190,14 +191,12 @@ const Jejum = () => {
     setFastStartTime(null); // Resetar o jejum atual
     setElapsedTime(0); // Resetar tempo decorrido
     setFastCompletedGoal(false); // Resetar estado de meta completa
+    
+    // Cancelar notificações de progresso agendadas
+    cancelFastingProgress();
 
     // 🗑️ Jejum removido do localStorage
     console.log('🗑️ Jejum removido do localStorage (via setFastStartTime(null))');
-
-    // Enviar notificação de jejum completo
-    if (isGoalMet) {
-      sendFastingNotification('completed');
-    }
     
     // Resetar refs de notificação de progresso
     halfwayNotifiedRef.current = false;
@@ -208,7 +207,7 @@ const Jejum = () => {
       const currentStreak = getCurrentStreak(); // Obter a sequência atualizada
       showSuccess(`🎉 Parabéns! Você completou seu jejum de ${fastingProtocol.hours}h!\n\n🔥 Sequência: ${currentStreak} ${currentStreak === 1 ? 'dia' : 'dias'}`);
     }
-  }, [fastStartTime, fastingProtocol, addFastEntry, getCurrentStreak, setFastStartTime, sendFastingNotification]);
+  }, [fastStartTime, fastingProtocol, addFastEntry, getCurrentStreak, setFastStartTime]);
 
   // Efeito para verificar automaticamente a conclusão do jejum
   useEffect(() => {
@@ -241,9 +240,22 @@ const Jejum = () => {
   const handleStartFast = () => {
     // 🔥 INICIANDO JEJUM
     console.log('🔥 INICIANDO JEJUM: Chamando setFastStartTime com Date.now()');
-    setFastStartTime(Date.now()); // Isso aciona o useEffect em AppContext para salvar
+    const startTime = Date.now();
+    setFastStartTime(startTime); // Isso aciona o useEffect em AppContext para salvar
     setFastCompletedGoal(false); // Garante que o estado de meta completa seja falso ao iniciar
-    sendFastingNotification('started'); // Enviar notificação de jejum iniciado
+    
+    // Agendar notificações de progresso via Service Worker
+    scheduleFastingProgress(
+      {
+        halfway: notificationSettings.fasting.halfway,
+        threeQuarters: notificationSettings.fasting.threeQuarters,
+        completed: notificationSettings.fasting.completed
+      },
+      {
+        startTime: startTime,
+        goalHours: fastingProtocol.hours
+      }
+    );
   };
 
   // Termina o jejum (chamado pelo botão)

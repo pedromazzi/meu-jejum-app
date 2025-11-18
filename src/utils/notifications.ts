@@ -19,76 +19,68 @@ export const requestNotificationPermission = async (): Promise<NotificationPermi
   }
 };
 
-const showNotification = (title: string, options?: NotificationOptions) => {
-  if (!checkNotificationSupport()) return;
+// ========== COMUNICAÇÃO COM SERVICE WORKER ==========
 
-  if (Notification.permission === 'granted') {
+export const sendMessageToSW = async (type: string, data?: any) => {
+  if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
     try {
-      new Notification(title, {
-        icon: '/icon-192.png',
-        badge: '/icon-192.png',
-        ...options,
-      });
+      navigator.serviceWorker.controller.postMessage({ type, data });
+      console.log(`Mensagem enviada ao SW: ${type}`, data);
     } catch (error) {
-      console.error('Erro ao exibir notificação:', error);
+      console.error('Erro ao enviar mensagem ao SW:', error);
     }
+  } else {
+    console.warn('Service Worker não está ativo');
   }
 };
 
-// Notificações de jejum
-export const notifyFastStarted = (protocolName: string) => {
-  showNotification('🌟 Jejum Iniciado!', {
-    body: `Seu jejum ${protocolName} começou. Boa sorte!`,
-    tag: 'fast-started',
-  });
+export const scheduleWaterNotifications = (settings: {
+  enabled: boolean;
+  interval: number;
+  startTime: string;
+  endTime: string;
+}) => {
+  if (settings.enabled) {
+    sendMessageToSW('SCHEDULE_WATER_NOTIFICATIONS', settings);
+  } else {
+    sendMessageToSW('CANCEL_WATER_NOTIFICATIONS');
+  }
 };
 
-export const notifyFastProgress = (percentage: number, remaining: string) => {
-  showNotification(`🔥 ${percentage}% Completo!`, {
-    body: `Faltam ${remaining} para sua meta. Continue firme!`,
-    tag: 'fast-progress',
-  });
+export const scheduleFastingProgress = (
+  settings: {
+    halfway: boolean;
+    threeQuarters: boolean;
+    completed: boolean;
+  },
+  fastData: {
+    startTime: number;
+    goalHours: number;
+  }
+) => {
+  sendMessageToSW('SCHEDULE_FASTING_PROGRESS', { settings, fastData });
 };
 
-export const notifyFastCompleted = (streak: number) => {
-  const messages = [
-    '🎉 Parabéns! Jejum completo!',
-    '🏆 Meta alcançada!',
-    '⭐ Excelente trabalho!',
-  ];
-  const message = messages[Math.floor(Math.random() * messages.length)];
-  
-  showNotification(message, {
-    body: `Sequência atual: ${streak} dias`,
-    tag: 'fast-completed',
-  });
+export const cancelFastingProgress = () => {
+  sendMessageToSW('CANCEL_FASTING_PROGRESS');
 };
 
-export const notifyDailyReminder = () => {
-  showNotification('⏰ Lembrete de Jejum', {
-    body: 'Está na hora de iniciar seu jejum!',
-    tag: 'daily-reminder',
-  });
-};
-
-// Notificações de água
-export const notifyWaterReminder = () => {
-  showNotification('💧 Hora de Beber Água!', {
-    body: 'Mantenha-se hidratado durante o dia.',
-    tag: 'water-reminder',
-  });
+export const scheduleDailyReminder = (settings: {
+  dailyReminder: boolean;
+  reminderTime: string;
+}) => {
+  if (settings.dailyReminder) {
+    sendMessageToSW('SCHEDULE_DAILY_REMINDER', settings);
+  } else {
+    sendMessageToSW('CANCEL_DAILY_REMINDER');
+  }
 };
 
 export const notifyWaterGoalReached = () => {
-  showNotification('✅ Meta de Água Atingida!', {
-    body: 'Parabéns! Você alcançou sua meta diária de hidratação.',
-    tag: 'water-goal',
-  });
+  sendMessageToSW('SHOW_WATER_GOAL_NOTIFICATION');
 };
 
 export const notifyLowWater = () => {
-  showNotification('⚠️ Pouca Água!', {
-    body: 'Você está abaixo de 30% da sua meta. Beba mais água!',
-    tag: 'low-water',
-  });
+  sendMessageToSW('SHOW_LOW_WATER_NOTIFICATION');
 };
+
