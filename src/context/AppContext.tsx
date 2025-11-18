@@ -1,13 +1,10 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { loadData, saveData, defaultAppData, type AppDataState } from '../utils/localStorage';
 import {
-  notifyFastStarted,
-  notifyFastProgress,
-  notifyFastCompleted,
-  notifyDailyReminder,
-  notifyWaterReminder,
   notifyWaterGoalReached,
   notifyLowWater,
+  scheduleFastingProgress,
+  cancelFastingProgress,
   checkNotificationSupport,
   requestNotificationPermission
 } from '../utils/notifications'; // Importar funções de notificação
@@ -142,8 +139,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Refs para controlar se as notificações de progresso já foram enviadas
   const halfwayNotifiedRef = useRef(false);
   const threeQuartersNotifiedRef = useRef(false);
-  const waterReminderIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  const dailyFastReminderTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Load data from localStorage on initial mount
   useEffect(() => {
@@ -446,157 +441,29 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // --- Lógica de Notificações ---
   const sendFastingNotification = useCallback(async (type: 'started' | 'progress50' | 'progress75' | 'completed' | 'dailyReminder', data?: any) => {
-    if (!checkNotificationSupport() || !(await requestNotificationPermission())) return;
-
-    const protocol = appData.fastingProtocol;
-    const currentStreak = getCurrentStreak(); // Obter a streak atualizada
-
-    switch (type) {
-      case 'started':
-        if (notificationSettings.fasting.started) {
-          notifyFastStarted(protocol.name);
-        }
-        break;
-      case 'progress50':
-        if (notificationSettings.fasting.halfway && !halfwayNotifiedRef.current) {
-          notifyFastProgress(50, data.remaining);
-          halfwayNotifiedRef.current = true;
-        }
-        break;
-      case 'progress75':
-        if (notificationSettings.fasting.threeQuarters && !threeQuartersNotifiedRef.current) {
-          notifyFastProgress(75, data.remaining);
-          threeQuartersNotifiedRef.current = true;
-        }
-        break;
-      case 'completed':
-        if (notificationSettings.fasting.completed) {
-          notifyFastCompleted(currentStreak);
-        }
-        // Resetar refs de progresso ao completar
-        halfwayNotifiedRef.current = false;
-        threeQuartersNotifiedRef.current = false;
-        break;
-      case 'dailyReminder':
-        if (notificationSettings.fasting.dailyReminder) {
-          notifyDailyReminder();
-        }
-        break;
-    }
-  }, [appData.fastingProtocol, notificationSettings.fasting, getCurrentStreak]);
+    // As notificações de progresso agora são gerenciadas pelo Service Worker
+    // Esta função é mantida para compatibilidade mas não faz nada
+    // pois o SW agenda automaticamente as notificações quando o jejum inicia
+  }, []);
 
   const sendWaterNotification = useCallback(async (type: 'reminder' | 'goalReached' | 'lowWater', data?: any) => {
-    if (!checkNotificationSupport() || !(await requestNotificationPermission())) return;
+    if (!checkNotificationSupport()) return;
 
     const { consumed, goal } = appData.waterData;
 
     switch (type) {
-      case 'reminder':
-        if (notificationSettings.water.enabled) {
-          notifyWaterReminder();
-        }
-        break;
       case 'goalReached':
-        if (notificationSettings.water.goalReached) {
+        if (notificationSettings.water.goalReached && consumed >= goal) {
           notifyWaterGoalReached();
         }
         break;
       case 'lowWater':
-        if (notificationSettings.water.lowWaterAlert) {
+        if (notificationSettings.water.lowWaterAlert && consumed < goal * 0.3) {
           notifyLowWater();
         }
         break;
     }
   }, [appData.waterData, notificationSettings.water]);
-
-  // Efeito para agendar lembrete diário de jejum
-  useEffect(() => {
-    if (dailyFastReminderTimeoutRef.current) {
-      clearTimeout(dailyFastReminderTimeoutRef.current);
-    }
-
-    if (notificationSettings.fasting.dailyReminder) {
-      const [hours, minutes] = notificationSettings.fasting.reminderTime.split(':').map(Number);
-      const now = new Date();
-      let reminderDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours, minutes, 0);
-
-      // Se o horário já passou hoje, agendar para amanhã
-      if (reminderDate.getTime() < now.getTime()) {
-        reminderDate.setDate(reminderDate.getDate() + 1);
-      }
-
-      const timeToReminder = reminderDate.getTime() - now.getTime();
-
-      dailyFastReminderTimeoutRef.current = setTimeout(() => {
-        sendFastingNotification('dailyReminder', notificationSettings.fasting.reminderTime);
-        // Reagendar para o próximo dia
-        dailyFastReminderTimeoutRef.current = setTimeout(() => {
-          sendFastingNotification('dailyReminder', notificationSettings.fasting.reminderTime);
-        }, 24 * 60 * 60 * 1000); // 24 horas
-      }, timeToReminder);
-    }
-
-    return () => {
-      if (dailyFastReminderTimeoutRef.current) {
-        clearTimeout(dailyFastReminderTimeoutRef.current);
-      }
-    };
-  }, [notificationSettings.fasting.dailyReminder, notificationSettings.fasting.reminderTime, sendFastingNotification]);
-
-  // Efeito para agendar lembretes de água
-  useEffect(() => {
-    if (waterReminderIntervalRef.current) {
-      clearInterval(waterReminderIntervalRef.current);
-    }
-
-    if (notificationSettings.water.enabled && notificationSettings.water.interval > 0) {
-      const intervalMs = notificationSettings.water.interval * 60 * 1000;
-      const [startHour, startMinute] = notificationSettings.water.startTime.split(':').map(Number);
-      const [endHour, endMinute] = notificationSettings.water.endTime.split(':').map(Number);
-
-      const checkAndSendWaterReminder = () => {
-        const now = new Date();
-        const currentHour = now.getHours();
-        const currentMinute = now.getMinutes();
-
-        // Converter horários para minutos do dia para fácil comparação
-        const nowInMinutes = currentHour * 60 + currentMinute;
-        const startInMinutes = startHour * 60 + startMinute;
-        const endInMinutes = endHour * 60 + endMinute;
-
-        // Lógica para lidar com horários que cruzam a meia-noite (ex: 22:00 - 06:00)
-        let isInRange = false;
-        if (startInMinutes <= endInMinutes) {
-          // Intervalo normal (ex: 08:00 - 22:00)
-          isInRange = nowInMinutes >= startInMinutes && nowInMinutes <= endInMinutes;
-        } else {
-          // Intervalo que cruza a meia-noite (ex: 22:00 - 06:00)
-          isInRange = nowInMinutes >= startInMinutes || nowInMinutes <= endInMinutes;
-        }
-
-        if (isInRange) {
-          sendWaterNotification('reminder');
-        }
-      };
-
-      // Enviar o primeiro lembrete imediatamente se estiver dentro do horário
-      checkAndSendWaterReminder();
-      // Agendar lembretes subsequentes
-      waterReminderIntervalRef.current = setInterval(checkAndSendWaterReminder, intervalMs);
-    }
-
-    return () => {
-      if (waterReminderIntervalRef.current) {
-        clearInterval(waterReminderIntervalRef.current);
-      }
-    };
-  }, [
-    notificationSettings.water.enabled,
-    notificationSettings.water.interval,
-    notificationSettings.water.startTime,
-    notificationSettings.water.endTime,
-    sendWaterNotification
-  ]);
 
   const contextValue = {
     appData,

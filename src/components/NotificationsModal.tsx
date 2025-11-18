@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
-import { requestNotificationPermission } from '../utils/notifications';
+import { 
+  requestNotificationPermission, 
+  scheduleWaterNotifications,
+  scheduleDailyReminder 
+} from '../utils/notifications';
 
 interface NotificationsModalProps {
   isOpen: boolean;
@@ -39,14 +43,31 @@ const NotificationsModal: React.FC<NotificationsModalProps> = ({ isOpen, onClose
   };
   
   const handleSave = async () => {
-    const permissionGranted = await requestNotificationPermission();
+    const permission = await requestNotificationPermission();
     
-    if (permissionGranted) {
-      updateNotificationSettings(settings);
-      onClose();
-    } else {
+    if (permission !== 'granted') {
       alert('Permissão de notificações negada. Ative nas configurações do navegador para receber alertas.');
+      return;
     }
+    
+    // Salvar configurações
+    updateNotificationSettings(settings);
+    
+    // Agendar notificações de água via Service Worker
+    scheduleWaterNotifications({
+      enabled: settings.water.enabled,
+      interval: settings.water.interval,
+      startTime: settings.water.startTime,
+      endTime: settings.water.endTime
+    });
+    
+    // Agendar lembrete diário via Service Worker
+    scheduleDailyReminder({
+      dailyReminder: settings.fasting.dailyReminder,
+      reminderTime: settings.fasting.reminderTime
+    });
+    
+    onClose();
   };
   
   if (!isOpen) return null;
