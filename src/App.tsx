@@ -8,6 +8,7 @@ import Progresso from './pages/Progresso';
 import Conquistas from './pages/Conquistas';
 import Aprender from './pages/Aprender';
 import NotFound from './pages/NotFound';
+import NotificationTest from './pages/NotificationTest';
 import BottomNav from './components/BottomNav';
 import Onboarding from './components/Onboarding';
 import InstallBanner from './components/InstallBanner';
@@ -42,6 +43,7 @@ const AppContent = () => {
             <Route path="/progresso" element={<Progresso />} />
             <Route path="/conquistas" element={<Conquistas />} />
             <Route path="/aprender" element={<Aprender />} />
+            <Route path="/notification-test" element={<NotificationTest />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </main>
