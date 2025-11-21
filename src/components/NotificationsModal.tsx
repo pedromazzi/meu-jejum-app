@@ -5,6 +5,7 @@ import {
   scheduleWaterNotifications,
   scheduleDailyReminder 
 } from '../utils/notifications';
+import { registerPushNotifications, scheduleWaterReminder } from '../utils/pushNotifications';
 
 interface NotificationsModalProps {
   isOpen: boolean;
@@ -50,10 +51,26 @@ const NotificationsModal: React.FC<NotificationsModalProps> = ({ isOpen, onClose
       return;
     }
     
+    // Registrar push notifications primeiro
+    console.log('🔔 Registrando Web Push Notifications...');
+    const subscription = await registerPushNotifications();
+    
+    if (!subscription) {
+      console.warn('⚠️ Push notifications não registradas, usando fallback local');
+      // Continuar mesmo sem push, usar notificações locais como fallback
+    } else {
+      console.log('✅ Push notifications registradas com sucesso!');
+      
+      // Se lembretes de água ativos, agendar no backend
+      if (settings.water.enabled) {
+        await scheduleWaterReminder(settings.water.interval);
+      }
+    }
+    
     // Salvar configurações
     updateNotificationSettings(settings);
     
-    // Agendar notificações de água via Service Worker
+    // Agendar notificações de água via Service Worker (fallback local)
     scheduleWaterNotifications({
       enabled: settings.water.enabled,
       interval: settings.water.interval,

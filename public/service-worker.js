@@ -347,3 +347,32 @@ self.addEventListener('notificationclick', (event) => {
       })
   );
 });
+
+// ========== WEB PUSH NOTIFICATIONS ==========
+
+self.addEventListener('push', function(event) {
+  console.log('📬 Push recebido:', event);
+  
+  let data = { title: 'MeuJejum', body: 'Nova notificação' };
+  
+  if (event.data) {
+    try {
+      data = event.data.json();
+    } catch (e) {
+      console.error('Erro ao parsear push:', e);
+    }
+  }
+  
+  const options = {
+    body: data.body,
+    icon: '/icon-192.png',
+    badge: '/icon-192.png',
+    tag: data.tag || 'default',
+    requireInteraction: false,
+    data: { url: data.url || '/' }
+  };
+  
+  event.waitUntil(
+    self.registration.showNotification(data.title, options)
+  );
+});
