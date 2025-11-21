@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { showSuccess } from '../utils/toast'; // Importar para notificações
 import { isAppInstalled, isSafariBrowser } from '../utils/pwa'; // Importar utilitários PWA
 import { scheduleFastingProgress, cancelFastingProgress } from '../utils/notifications'; // Importar funções de notificação SW
+import { scheduleFastingNotification } from '../utils/pushNotifications';
 
 // Define tipos para melhor segurança de tipo
 interface FastingProtocol {
@@ -237,14 +238,14 @@ const Jejum = () => {
   }, [isFasting, fastStartTime, fastingProtocol.hours, fastCompletedGoal, completeFastAndSave]);
 
   // Inicia o jejum
-  const handleStartFast = () => {
+  const handleStartFast = async () => {
     // 🔥 INICIANDO JEJUM
     console.log('🔥 INICIANDO JEJUM: Chamando setFastStartTime com Date.now()');
     const startTime = Date.now();
     setFastStartTime(startTime); // Isso aciona o useEffect em AppContext para salvar
     setFastCompletedGoal(false); // Garante que o estado de meta completa seja falso ao iniciar
     
-    // Agendar notificações de progresso via Service Worker
+    // Agendar notificações de progresso via Service Worker (fallback local)
     scheduleFastingProgress(
       {
         halfway: notificationSettings.fasting.halfway,
@@ -256,6 +257,42 @@ const Jejum = () => {
         goalHours: fastingProtocol.hours
       }
     );
+    
+    // Calcular horários para Web Push Notifications
+    const goalMs = fastingProtocol.hours * 60 * 60 * 1000;
+    
+    // Agendar 50% no backend
+    if (notificationSettings.fasting.halfway) {
+      const halfway = new Date(startTime + goalMs * 0.5);
+      await scheduleFastingNotification(
+        50,
+        halfway.toISOString(),
+        '🔥 Jejum 50%',
+        'Você está na metade! Continue firme! 💪'
+      );
+    }
+    
+    // Agendar 75% no backend
+    if (notificationSettings.fasting.threeQuarters) {
+      const threeQuarters = new Date(startTime + goalMs * 0.75);
+      await scheduleFastingNotification(
+        75,
+        threeQuarters.toISOString(),
+        '🔥 Jejum 75%',
+        'Quase lá! Faltam 25%! 🔥'
+      );
+    }
+    
+    // Agendar 100% no backend
+    if (notificationSettings.fasting.completed) {
+      const endTime = new Date(startTime + goalMs);
+      await scheduleFastingNotification(
+        100,
+        endTime.toISOString(),
+        '🎉 Jejum Completo!',
+        'Parabéns! Você completou o jejum! 💪🎊'
+      );
+    }
   };
 
   // Termina o jejum (chamado pelo botão)
