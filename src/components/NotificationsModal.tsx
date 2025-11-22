@@ -6,6 +6,7 @@ import {
   scheduleDailyReminder 
 } from '../utils/notifications';
 import { registerPushNotifications, scheduleWaterReminder } from '../utils/pushNotifications';
+import { showSuccess, showError } from '../utils/toast';
 
 interface NotificationsModalProps {
   isOpen: boolean;
@@ -16,6 +17,7 @@ const NotificationsModal: React.FC<NotificationsModalProps> = ({ isOpen, onClose
   const { notificationSettings, updateNotificationSettings } = useApp();
   
   const [settings, setSettings] = useState(notificationSettings);
+  const [isSaving, setIsSaving] = useState(false);
   
   useEffect(() => {
     if (isOpen && notificationSettings) {
@@ -44,47 +46,65 @@ const NotificationsModal: React.FC<NotificationsModalProps> = ({ isOpen, onClose
   };
   
   const handleSave = async () => {
-    const permission = await requestNotificationPermission();
-    
-    if (permission !== 'granted') {
-      alert('Permissão de notificações negada. Ative nas configurações do navegador para receber alertas.');
-      return;
-    }
-    
-    // Registrar push notifications primeiro
-    console.log('🔔 Registrando Web Push Notifications...');
-    const subscription = await registerPushNotifications();
-    
-    if (!subscription) {
-      console.warn('⚠️ Push notifications não registradas, usando fallback local');
-      // Continuar mesmo sem push, usar notificações locais como fallback
-    } else {
-      console.log('✅ Push notifications registradas com sucesso!');
+    try {
+      setIsSaving(true);
+      console.log('🔔 Salvando configurações de notificações...');
       
-      // Se lembretes de água ativos, agendar no backend
+      // Solicitar permissão
+      const permission = await requestNotificationPermission();
+      
+      if (permission !== 'granted') {
+        showError('Permissão de notificações negada. Ative nas configurações do navegador.');
+        setIsSaving(false);
+        return;
+      }
+      
+      // PRIMEIRO: Registrar dispositivo no backend
+      console.log('🔔 Registrando dispositivo no backend...');
+      const subscription = await registerPushNotifications();
+      
+      if (!subscription) {
+        showError('Não foi possível ativar notificações. Verifique as permissões no navegador.');
+        setIsSaving(false);
+        return;
+      }
+      
+      console.log('✅ Dispositivo registrado no backend!');
+      
+      // SEGUNDO: Se lembretes de água estão ativos, agendar no backend
       if (settings.water.enabled) {
+        console.log(`💧 Agendando lembretes de água: ${settings.water.interval} min`);
         await scheduleWaterReminder(settings.water.interval);
       }
+      
+      // TERCEIRO: Salvar configurações localmente
+      updateNotificationSettings(settings);
+      
+      // Agendar notificações de água via Service Worker (fallback local)
+      scheduleWaterNotifications({
+        enabled: settings.water.enabled,
+        interval: settings.water.interval,
+        startTime: settings.water.startTime,
+        endTime: settings.water.endTime
+      });
+      
+      // Agendar lembrete diário via Service Worker
+      scheduleDailyReminder({
+        dailyReminder: settings.fasting.dailyReminder,
+        reminderTime: settings.fasting.reminderTime
+      });
+      
+      console.log('✅ Tudo configurado!');
+      showSuccess('Notificações configuradas com sucesso!');
+      
+      setIsSaving(false);
+      onClose();
+      
+    } catch (error) {
+      console.error('❌ Erro ao configurar notificações:', error);
+      showError('Erro ao configurar notificações. Tente novamente.');
+      setIsSaving(false);
     }
-    
-    // Salvar configurações
-    updateNotificationSettings(settings);
-    
-    // Agendar notificações de água via Service Worker (fallback local)
-    scheduleWaterNotifications({
-      enabled: settings.water.enabled,
-      interval: settings.water.interval,
-      startTime: settings.water.startTime,
-      endTime: settings.water.endTime
-    });
-    
-    // Agendar lembrete diário via Service Worker
-    scheduleDailyReminder({
-      dailyReminder: settings.fasting.dailyReminder,
-      reminderTime: settings.fasting.reminderTime
-    });
-    
-    onClose();
   };
   
   if (!isOpen) return null;
@@ -240,8 +260,16 @@ const NotificationsModal: React.FC<NotificationsModalProps> = ({ isOpen, onClose
         
         {/* Footer com botão */}
         <div className="modal-footer">
-          <button className="btn-save" onClick={handleSave}>
-            SALVAR CONFIGURAÇÕES
+          <button 
+            className="btn-save" 
+            onClick={handleSave}
+            disabled={isSaving}
+            style={{ 
+              opacity: isSaving ? 0.6 : 1,
+              cursor: isSaving ? 'not-allowed' : 'pointer'
+            }}
+          >
+            {isSaving ? 'CONFIGURANDO...' : 'SALVAR CONFIGURAÇÕES'}
           </button>
         </div>
         
